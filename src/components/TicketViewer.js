@@ -1,72 +1,82 @@
+import { Skeleton, Stack } from '@mui/material';
 import { Box } from '@mui/system';
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
+import Error from './Error';
+import PaginationButtons from './PaginationButtons';
 import TicketCard from './TicketCard';
+import TicketDetailed from './TicketDetailed';
 
 const TicketViewer = () => {
-  const [page, setPage] = useState(1);
+  const perPage = 25;
+  const url = `https://zccjinghaoong.zendesk.com/api/v2/tickets.json?page[size]=${perPage}`;
+  const auth = `Bearer ${process.env.REACT_APP_TOKEN}`;
+
+  const [curr, setCurr] = useState(url);
+  const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState([]);
+  const [ticketUrl, setTicketUrl] = useState('');
+
+  const fetchData = async () => {
+    setLoading(true);
+    fetch(curr, {
+      method: 'GET',
+      mode: 'cors',
+      credentials: 'same-origin',
+      headers: {
+        'Authorization': auth
+      }
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log(data);
+        setData(data);
+        setLoading(false);
+      })
+      .catch(error => {
+        setError(true);
+        console.error(error);
+        setLoading(false);
+      })
+  };
 
   useEffect(() => {
+    fetchData();
+  }, [curr]);
 
-  }, [page])
+  let { tickets, meta, links } = data;
 
-  const tickets = [
-    {
-      "requester_id": 1,
-      "assignee_id": 5,
-      "subject": "velit eiusmod reprehenderit officia cupidatat",
-      "description": "Aute ex sunt culpa ex ea esse sint cupidatat aliqua ex consequat sit reprehenderit. Velit labore proident quis culpa ad duis adipisicing laboris voluptate velit incididunt minim consequat nulla. Laboris adipisicing reprehenderit minim tempor officia ullamco occaecat ut laborum.\n\nAliquip velit adipisicing exercitation irure aliqua qui. Commodo eu laborum cillum nostrud eu. Mollit duis qui non ea deserunt est est et officia ut excepteur Lorem pariatur deserunt.",
-      "tags": [
-        "est",
-        "nisi",
-        "incididunt"
-      ]
-    },
-    {
-      "requester_id": 2,
-      "assignee_id": 8,
-      "subject": "excepteur laborum ex occaecat Lorem",
-      "description": "Exercitation amet in laborum minim. Nulla et veniam laboris dolore fugiat aliqua et sit mollit. Dolor proident nulla mollit culpa in officia pariatur officia magna eu commodo duis.\n\nAliqua reprehenderit aute qui voluptate dolor deserunt enim aute tempor ad dolor fugiat. Mollit aliquip elit aliqua eiusmod. Ex et anim non exercitation consequat elit dolore excepteur. Aliqua reprehenderit non culpa sit consequat cupidatat elit.",
-      "tags": [
-        "labore",
-        "voluptate",
-        "amet"
-      ]
-    },
-    {
-      "requester_id": 3,
-      "assignee_id": 10,
-      "subject": "ad sunt qui aute ullamco",
-      "description": "Sunt incididunt officia proident elit anim ullamco reprehenderit ut. Aliqua sint amet aliquip cillum minim magna consequat excepteur fugiat exercitation est exercitation. Adipisicing occaecat nisi aliqua exercitation.\n\nAute Lorem aute tempor sunt mollit dolor in consequat non cillum irure reprehenderit. Nulla deserunt qui aliquip officia duis incididunt et est velit nulla irure in fugiat in. Deserunt proident est in dolore culpa mollit exercitation ea anim consequat incididunt. Mollit et occaecat ullamco ut id incididunt laboris occaecat qui.",
-      "tags": [
-        "laborum",
-        "mollit",
-        "proident"
-      ]
-    },
-    {
-      "requester_id": 4,
-      "assignee_id": 10,
-      "subject": "aliquip mollit quis laborum incididunt",
-      "description": "Pariatur voluptate laborum voluptate sunt ad magna exercitation nulla. In in Lorem minim dolor laboris reprehenderit ad Lorem. Cupidatat laborum qui mollit nostrud magna ullamco. Tempor nisi ex ipsum fugiat dolor proident qui consectetur anim sunt. Dolore consectetur in ex esse et aliqua fugiat enim Lorem ea Lorem incididunt. Non amet elit pariatur commodo labore officia esse anim. In do mollit commodo nulla ullamco culpa cillum incididunt.\n\nEt nostrud aute fugiat voluptate tempor ad labore in elit et sunt. Enim quis nulla eu ut sit. Pariatur irure officia occaecat non dolor est excepteur anim incididunt commodo ea cupidatat minim excepteur. Cillum proident tempor laborum amet est ipsum ipsum aliqua sit sunt reprehenderit fugiat aliqua ea.",
-      "tags": [
-        "consectetur",
-        "mollit",
-        "sit"
-      ]
-    },
-    {
-      "requester_id": 5,
-      "assignee_id": 10,
-      "subject": "nisi aliquip ipsum nostrud amet",
-      "description": "Aute Lorem fugiat ad consectetur sint fugiat. Et qui ipsum in qui nostrud nulla qui et occaecat culpa ad occaecat. Aute mollit occaecat mollit proident nostrud non ea laboris adipisicing deserunt officia. Eiusmod sint fugiat veniam consectetur consequat exercitation esse est.\n\nVelit est ipsum labore aliquip quis mollit laborum in. Consectetur cillum proident ullamco exercitation pariatur. Incididunt consectetur tempor adipisicing esse minim mollit Lorem.",
-      "tags": [
-        "et",
-        "occaecat",
-        "cillum"
-      ]
-    },
-  ];
+  useEffect(() => {
+    ({ tickets, meta, links } = data);
+  }, [data])
+
+  const reloadTickets = () => {
+    fetchData();
+  };
+
+  const handleNextPage = () => {
+    setCurr(links.next);
+  };
+
+  const handleFirstPage = () => {
+    setCurr(url);
+  }
+
+  const [open, setOpen] = useState(false);
+
+  const handleClickOpen = (url) => {
+    setTicketUrl(url);
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    fetchData();
+    ({ tickets, meta, links } = data);
+    setOpen(false);
+  };
+
+  const firstPage = curr === url;
 
   return (
     <>
@@ -74,17 +84,56 @@ const TicketViewer = () => {
         <title>Zendesk | Ticket Viewer</title>
       </Helmet>
       <Box
-        sx={{
-          mx: 30,
-          my: 10,
-          p: 5,
-          minHeight: "100%"
+        minHeight="100%"
+        mt="2em"
+        mx={{
+          md: 20,
+          l: 30,
+          xl: 30
         }}
       >
-        {tickets.map((ticket) => <TicketCard ticket={ticket} />)}
+        {error && <Error />}
+        <PaginationButtons
+          firstPage={firstPage}
+          loading={loading}
+          meta={meta}
+          handleFirstPage={handleFirstPage}
+          handleNextPage={handleNextPage}
+          reloadTickets={reloadTickets}
+        />
+        {loading
+          ?
+          <Stack spacing={1} my={1}>
+            <Skeleton variant="rectangular" height={50} />
+            <Skeleton variant="rectangular" height={50} />
+            <Skeleton variant="rectangular" height={50} />
+            <Skeleton variant="rectangular" height={50} />
+            <Skeleton variant="rectangular" height={50} />
+            <Skeleton variant="rectangular" height={50} />
+            <Skeleton variant="rectangular" height={50} />
+            <Skeleton variant="rectangular" height={50} />
+            <Skeleton variant="rectangular" height={50} />
+          </Stack>
+          :
+          tickets.map(ticket =>
+            <TicketCard
+              key={ticket.id}
+              handleClickOpen={handleClickOpen}
+              ticket={ticket}
+            />)
+        }
+        <PaginationButtons
+          firstPage={firstPage}
+          loading={loading}
+          meta={meta}
+          handleFirstPage={handleFirstPage}
+          handleNextPage={handleNextPage}
+          reloadTickets={reloadTickets}
+        />
       </Box>
+      {open && <TicketDetailed open={open} handleClose={handleClose} ticketUrl={ticketUrl} />}
     </>
-  )
-}
+  );
+};
 
 export default TicketViewer;
