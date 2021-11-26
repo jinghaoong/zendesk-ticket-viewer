@@ -1,68 +1,34 @@
 import { Skeleton, Stack } from '@mui/material';
 import { Box } from '@mui/system';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import Error from './Error';
-import PaginationButtons from './PaginationButtons';
+import PaginationCluster from './PaginationCluster';
 import TicketCard from './TicketCard';
 import TicketDetailed from './TicketDetailed';
 
-const TicketViewer = () => {
-  const perPage = 25;
-  const url = `https://zccjinghaoong.zendesk.com/api/v2/tickets.json?page[size]=${perPage}`;
-  const auth = `Bearer ${process.env.REACT_APP_TOKEN}`;
+const token = process.env.REACT_APP_TOKEN;
+const auth = `Bearer ${token}`;
+const baseUrl = process.env.REACT_APP_ZCC_URL; // Company Domain URL
+const ticketsUrl = `${baseUrl}api/v2/tickets`;
+const perPage = 25;
 
-  const [curr, setCurr] = useState(url);
-  const [error, setError] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [data, setData] = useState([]);
-  const [ticketUrl, setTicketUrl] = useState('');
-
-  const fetchData = async () => {
-    setLoading(true);
-    fetch(curr, {
-      method: 'GET',
-      mode: 'cors',
-      credentials: 'same-origin',
-      headers: {
-        'Authorization': auth
-      }
-    })
-      .then(response => response.json())
-      .then(data => {
-        console.log(data);
-        setData(data);
-        setLoading(false);
-      })
-      .catch(error => {
-        setError(true);
-        console.error(error);
-        setLoading(false);
-      })
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, [curr]);
-
-  let { tickets, meta, links } = data;
-
-  useEffect(() => {
-    ({ tickets, meta, links } = data);
-  }, [data])
-
-  const reloadTickets = () => {
-    fetchData();
-  };
-
-  const handleNextPage = () => {
-    setCurr(links.next);
-  };
-
-  const handleFirstPage = () => {
-    setCurr(url);
+const getRequestAttributes = {
+  method: 'GET',
+  mode: 'cors',
+  credentials: 'same-origin',
+  headers: {
+    'Authorization': auth
   }
+};
 
+const TicketViewer = () => {
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  /**
+   * Dialog State and Handlers
+   */
   const [open, setOpen] = useState(false);
 
   const handleClickOpen = (url) => {
@@ -71,12 +37,129 @@ const TicketViewer = () => {
   };
 
   const handleClose = () => {
-    fetchData();
-    ({ tickets, meta, links } = data);
     setOpen(false);
   };
 
-  const firstPage = curr === url;
+  /*
+  const [count, setCount] = useState(-1);
+  const [numPages, setNumPages] = useState(-1);
+
+  useEffect(() => {
+    setNumPages(Math.ceil(count / perPage));
+  }, [count]);
+  */
+
+  const cursorUrl = `${baseUrl}api/v2/tickets.json?page[size]=${perPage}`;
+  const [currUrl, setCurrUrl] = useState(cursorUrl);
+  const [currData, setCurrData] = useState([]);
+  const [ticketUrl, setTicketUrl] = useState('');
+
+  const ticketCount = useRef();
+  const pageNumber = useRef(1);
+  const pageUrls = useRef({ 1: cursorUrl });
+
+  const handleErrors = (error) => {
+    console.log(error.statusCode);
+    if (!error.status) {
+      setError("Error: Couldn't Authenticate You / Unable to retrieve tickets");
+    } else {
+      switch (error.status) {
+        case 429:
+          setError('Read limit exceeded, please wait 1 minute before reloading');
+          break;
+        default:
+          setError('Unable to retrieve tickets');
+          break;
+      };
+    }
+    return;
+  };
+
+  /**
+   * Functions and Handlers
+   */
+  const fetchAll = async () => {
+    setLoading(true);
+
+    fetch(ticketsUrl, getRequestAttributes)
+      .then(response => response.json())
+      .then(data => {
+        const { count } = data;
+        console.log(count);
+        ticketCount.current = count;
+      })
+      .catch(error => {
+        handleErrors(error)
+        setLoading(false);
+      });
+  }
+
+  const fetchCurrPage = async () => {
+    setLoading(true);
+
+    fetch(currUrl, getRequestAttributes)
+      .then(response => {
+        console.log(response);
+        return response.json();
+      })
+      .then(data => {
+        setCurrData(data);
+        setLoading(false);
+      })
+      .catch(error => {
+        handleErrors(error);
+        setLoading(false);
+      });
+  };
+
+  useEffect(() => {
+    fetchAll()
+    fetchCurrPage();
+  }, [currUrl]);
+
+  let { tickets, meta, links } = currData;
+
+  useEffect(() => {
+    ({ tickets, meta, links } = currData);
+  }, [currData]);
+
+  const reloadTickets = () => {
+    fetchCurrPage();
+  };
+
+  const handleToStartPage = () => {
+    pageNumber.current = 1;
+    setCurrUrl(cursorUrl);
+  }
+
+  const handlePrevPage = () => {
+    if (pageNumber === 2) {
+      handleToStartPage();
+    } else {
+      pageNumber.current = pageNumber.current - 1;
+      setCurrUrl(links.prev);
+      pageUrls.current[pageNumber.current] = links.prev;
+    }
+  }
+
+  const handleNextPage = () => {
+    pageNumber.current = pageNumber.current + 1;
+    setCurrUrl(links.next);
+    pageUrls.current[pageNumber.current] = links.next;
+  }
+
+  const paginationProps = {
+    perPage,
+    ticketCount,
+    pageNumber,
+    pageUrls,
+    loading,
+    meta,
+    reloadTickets,
+    handleToStartPage,
+    handlePrevPage,
+    handleNextPage
+  };
 
   return (
     <>
@@ -92,17 +175,13 @@ const TicketViewer = () => {
           xl: 30
         }}
       >
-        {error && <Error />}
-        <PaginationButtons
-          firstPage={firstPage}
-          loading={loading}
-          meta={meta}
-          handleFirstPage={handleFirstPage}
-          handleNextPage={handleNextPage}
-          reloadTickets={reloadTickets}
-        />
-        {loading
-          ?
+        {error && <Error error={error} />}
+        {(!error && ticketCount)
+          &&
+          <PaginationCluster {...paginationProps} />
+        }
+        {(loading && !error)
+          &&
           <Stack spacing={1} my={1}>
             <Skeleton variant="rectangular" height={50} />
             <Skeleton variant="rectangular" height={50} />
@@ -114,7 +193,9 @@ const TicketViewer = () => {
             <Skeleton variant="rectangular" height={50} />
             <Skeleton variant="rectangular" height={50} />
           </Stack>
-          :
+        }
+        {(!loading && !error)
+          &&
           tickets.map(ticket =>
             <TicketCard
               key={ticket.id}
@@ -122,14 +203,6 @@ const TicketViewer = () => {
               ticket={ticket}
             />)
         }
-        <PaginationButtons
-          firstPage={firstPage}
-          loading={loading}
-          meta={meta}
-          handleFirstPage={handleFirstPage}
-          handleNextPage={handleNextPage}
-          reloadTickets={reloadTickets}
-        />
       </Box>
       {open && <TicketDetailed open={open} handleClose={handleClose} ticketUrl={ticketUrl} />}
     </>
