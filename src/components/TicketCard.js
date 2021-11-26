@@ -2,20 +2,45 @@ import {
   Card,
   CardActions,
   CardContent,
-  Chip, IconButton,
+  Chip,
+  IconButton,
+  Skeleton,
   Stack,
   Typography
 } from '@mui/material';
 import { FiMoreHorizontal } from 'react-icons/fi';
+import { useEffect, useState } from 'react';
 
-const statusCodes = {
-  'open': 'o',
-  'pending': 'p',
-  'solved': 's',
-  'closed': 'c'
-};
+const auth = `Bearer ${process.env.REACT_APP_TOKEN}`;
 
 const TicketCard = ({ handleClickOpen, ticket }) => {
+  const [users, setUsers] = useState([]);
+
+  const fetchUser = async (user_id) => {
+    return fetch(
+      `${process.env.REACT_APP_ZCC_URL}api/v2/users/${user_id}`, {
+      method: 'GET',
+      mode: 'cors',
+      credentials: 'same-origin',
+      headers: {
+        'Authorization': auth
+      }
+    })
+      .then(response => response.json())
+      .then(data => data.user);
+  }
+
+  const fetchUsers = async () => {
+    const fetchRequester = fetchUser(ticket.requester_id);
+    const fetchAssignee = fetchUser(ticket.assignee_id);
+
+    Promise.all([fetchRequester, fetchAssignee]).then(data => setUsers(data));
+  }
+
+  useEffect(() => {
+    fetchUsers();
+  }, [])
+
   return (
     <Card key={ticket.id} variant="outlined" sx={{ my: 1 }}>
       <CardContent>
@@ -24,8 +49,10 @@ const TicketCard = ({ handleClickOpen, ticket }) => {
           <Typography>{ticket.subject}</Typography>
         </Stack>
         <Stack>
-          <Typography>Requester id: <b>{ticket.requester_id}</b></Typography>
-          <Typography>Assignee id: <b>{ticket.assignee_id}</b></Typography>
+          {users[0] && <Typography>Requester: <b>{users[0].name}</b></Typography>}
+          {!users[0] && <Skeleton width={200} />}
+          {users[1] && <Typography>Assignee: <b>{users[1].name}</b></Typography>}
+          {!users[1] && <Skeleton width={200} />}
         </Stack>
       </CardContent>
       <CardActions>
