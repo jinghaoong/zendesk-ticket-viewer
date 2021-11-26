@@ -1,5 +1,5 @@
-import TicketViewer from './components/TicketViewer';
 import { StyledEngineProvider } from '@mui/styled-engine';
+import TicketViewer from './components/TicketViewer';
 import Header from './components/Header';
 
 function App() {
