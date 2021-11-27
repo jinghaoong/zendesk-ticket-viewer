@@ -1,12 +1,16 @@
+import { ThemeProvider } from '@emotion/react';
 import { StyledEngineProvider } from '@mui/styled-engine';
-import TicketViewer from './components/TicketViewer';
 import Header from './components/Header';
+import TicketViewer from './components/TicketViewer';
+import theme from './theme';
 
 function App() {
   return (
     <StyledEngineProvider injectFirst>
-      <Header />
-      <TicketViewer />
+      <ThemeProvider theme={theme}>
+        <Header />
+        <TicketViewer />
+      </ThemeProvider>
     </StyledEngineProvider>
   );
 }
