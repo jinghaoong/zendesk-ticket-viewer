@@ -14,10 +14,8 @@ import {
 } from "react-icons/fi";
 
 const PaginationCluster = ({
-  perPage,
   ticketCount,
   pageNumber,
-  pageUrls,
   loading,
   meta,
   reloadTickets,
@@ -25,10 +23,8 @@ const PaginationCluster = ({
   handlePrevPage,
   handleNextPage
 }) => {
-  const numPages = Math.ceil(ticketCount / perPage);
-
   return (
-    <Stack direction="row" spacing={2}>
+    <Stack direction="row" spacing={2} alignItems="center">
       <Button
         disabled={loading}
         title="Reload Tickets"
@@ -41,31 +37,33 @@ const PaginationCluster = ({
         <Button
           disabled={loading || pageNumber.current === 1}
           title="Back to Start"
-          onClick={handleToStartPage}>
+          onClick={handleToStartPage}
+        >
           <FiChevronsLeft />
         </Button>
         <Button
           disabled={loading || pageNumber.current === 1}
           title="Previous Page"
-          onClick={handlePrevPage}>
+          onClick={handlePrevPage}
+          color="secondary"
+        >
           <FiChevronLeft />
         </Button>
         <Button
           disabled={loading || !meta.has_more}
           title="Next Page"
-          onClick={handleNextPage}>
+          onClick={handleNextPage}
+          color="secondary"
+        >
           <FiChevronRight />
         </Button>
       </ButtonGroup>
-      <Typography variant="h6">
-        <Stack direction="row">
-          Total Tickets:&nbsp;
-          {loading ? <Skeleton width={50} />
-            : ticketCount.current}
-        </Stack>
+      <Typography variant="h6" textAlign="center">
+        {loading ? <Skeleton width={50} />
+          : <b>{ticketCount.current} tickets</b>}
       </Typography>
     </Stack>
   )
-}
+};
 
 export default PaginationCluster;
