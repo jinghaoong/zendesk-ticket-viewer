@@ -92,7 +92,7 @@ const TicketViewer = () => {
         handleErrors(error)
         setLoading(false);
       });
-  }
+  };
 
   const fetchCurrPage = async () => {
     setLoading(true);
@@ -130,7 +130,7 @@ const TicketViewer = () => {
   const handleToStartPage = () => {
     pageNumber.current = 1;
     setCurrUrl(cursorUrl);
-  }
+  };
 
   const handlePrevPage = () => {
     if (pageNumber === 2) {
@@ -140,13 +140,13 @@ const TicketViewer = () => {
       setCurrUrl(links.prev);
       pageUrls.current[pageNumber.current] = links.prev;
     }
-  }
+  };
 
   const handleNextPage = () => {
     pageNumber.current = pageNumber.current + 1;
     setCurrUrl(links.next);
     pageUrls.current[pageNumber.current] = links.next;
-  }
+  };
 
   const paginationProps = {
     perPage,
@@ -170,9 +170,9 @@ const TicketViewer = () => {
         minHeight="100%"
         mt="2em"
         mx={{
-          md: 20,
-          l: 30,
-          xl: 30
+          md: 10, // >900
+          lg: 30, // >1200
+          xl: 50 // >1536
         }}
       >
         {error && <Error error={error} />}
@@ -203,8 +203,18 @@ const TicketViewer = () => {
               ticket={ticket}
             />)
         }
+        {(!error && ticketCount)
+          &&
+          <PaginationCluster {...paginationProps} />
+        }
       </Box>
-      {open && <TicketDetailed open={open} handleClose={handleClose} ticketUrl={ticketUrl} />}
+      {open &&
+        <TicketDetailed
+          open={open}
+          handleClose={handleClose}
+          ticketUrl={ticketUrl}
+        />
+      }
     </>
   );
 };
