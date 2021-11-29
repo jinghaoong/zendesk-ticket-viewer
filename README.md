@@ -2,7 +2,7 @@
 
 Zendesk Ticket Viewer Web Application built using ReactJS with the Material UI Framework. The app fetches Tickets from the Zendesk API and displays them either:
 - in full on devices with larger screens or
-- in summarised form with the option of opening a detailed view modal
+- in summarised form with the option of opening a detailed view modal on devices with small screens (768px<)
 
 ## Installation and Setup
 
@@ -13,7 +13,7 @@ Ensure you have [NodeJS](https://nodejs.org/en/) installed (Version 16.13.0 as o
 $ git clone https://github.com/jinghaoong/zendesk-ticket-viewer.git
 ```
 
-2. Navigate into the repository folder.
+2. Navigate into the project folder.
 ```
 $ cd zendesk-ticket-viewer/
 ```
@@ -32,5 +32,11 @@ REACT_APP_ZCC_URL={Zendesk_Domain_URL}
 ## Usage
 Run the program with the following command and view the app in your browser at [http://localhost:3000](http://localhost:3000).
 ```
-$ npm run start
+$ npm start
+```
+
+## Running Tests
+Navigate to the project folder and run the following command in terminal/cmd.
+```
+$ npm test
 ```
