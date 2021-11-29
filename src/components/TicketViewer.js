@@ -7,12 +7,8 @@ import PaginationCluster from './PaginationCluster';
 import TicketCard from './TicketCard';
 import TicketDetailed from './TicketDetailed';
 
-const token = process.env.REACT_APP_TOKEN;
-const auth = `Bearer ${token}`;
+const auth = `Bearer ${process.env.REACT_APP_TOKEN}`;
 const baseUrl = process.env.REACT_APP_ZCC_URL; // Company Domain URL
-const ticketsUrl = `${baseUrl}api/v2/tickets`;
-const perPage = 25;
-
 const getRequestAttributes = {
   method: 'GET',
   mode: 'cors',
@@ -22,12 +18,15 @@ const getRequestAttributes = {
   }
 };
 
+const ticketsUrl = `${baseUrl}api/v2/tickets`;
+const perPage = 25;
+
 const TicketViewer = () => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
 
   /**
-   * Dialog State and Handlers
+   * Ticket details Dialog State and Handlers
    */
   const [open, setOpen] = useState(false);
 
@@ -40,18 +39,11 @@ const TicketViewer = () => {
     setOpen(false);
   };
 
-  /*
-  const [count, setCount] = useState(-1);
-  const [numPages, setNumPages] = useState(-1);
-
-  useEffect(() => {
-    setNumPages(Math.ceil(count / perPage));
-  }, [count]);
-  */
-
   const cursorUrl = `${baseUrl}api/v2/tickets.json?page[size]=${perPage}`;
   const [currUrl, setCurrUrl] = useState(cursorUrl);
   const [currData, setCurrData] = useState([]);
+
+  /** Used for detailed ticket view on smaller screens */
   const [ticketUrl, setTicketUrl] = useState('');
 
   const ticketCount = useRef();
@@ -76,7 +68,7 @@ const TicketViewer = () => {
   };
 
   /**
-   * Functions and Handlers
+   * Get total number of tickets
    */
   const fetchAll = async () => {
     setLoading(true);
@@ -94,6 +86,9 @@ const TicketViewer = () => {
       });
   };
 
+  /**
+   * Fetch tickets for current page
+   */
   const fetchCurrPage = async () => {
     setLoading(true);
 
@@ -112,9 +107,15 @@ const TicketViewer = () => {
       });
   };
 
+  /** 
+   * Upon page load / reload, fetch data
+   * and destructure into
+   * tickets: tickets for current page, 
+   * meta: contains info for next page, 
+   * links: previous and next page URLs, 
+   */
   useEffect(() => {
-    fetchAll()
-    fetchCurrPage();
+    reloadTickets();
   }, [currUrl]);
 
   let { tickets, meta, links } = currData;
@@ -123,7 +124,13 @@ const TicketViewer = () => {
     ({ tickets, meta, links } = currData);
   }, [currData]);
 
+  /**
+   * Pagination Functions / Handlers
+   * Reload, To Start, Previous, Next
+   * Passed in props to PaginationCluster
+   */
   const reloadTickets = () => {
+    fetchAll();
     fetchCurrPage();
   };
 
@@ -148,6 +155,9 @@ const TicketViewer = () => {
     pageUrls.current[pageNumber.current] = links.next;
   };
 
+  /**
+   * Props for PaginationCluster
+   */
   const paginationProps = {
     perPage,
     ticketCount,

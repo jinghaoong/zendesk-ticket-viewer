@@ -1,6 +1,10 @@
 import { createTheme } from "@mui/material";
 
 const theme = createTheme({
+  /**
+   * Theme using Zendesk Brand Colors
+   * https://brandland.zendesk.com/color#zendesk-colors
+   */
   palette: {
     background: {
       default: '#F8F9F9', // tofu
@@ -18,7 +22,8 @@ const theme = createTheme({
       primary: '#03363D' // kale
     },
     /**
-     * TIcket Status Colors
+     * Ticket Status Colors
+     * new, open, pending, hold, solved, closed
      */
     new: {
       main: '#E91E63', //pink(500)

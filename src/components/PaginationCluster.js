@@ -24,7 +24,11 @@ const PaginationCluster = ({
   handleNextPage
 }) => {
   return (
-    <Stack direction="row" spacing={2} alignItems="center">
+    <Stack
+      direction="row"
+      spacing={2}
+      alignItems="center"
+    >
       <Button
         disabled={loading}
         title="Reload Tickets"
@@ -59,8 +63,7 @@ const PaginationCluster = ({
         </Button>
       </ButtonGroup>
       <Typography variant="h6" textAlign="center">
-        {loading ? <Skeleton width={50} />
-          : <b>{ticketCount.current} tickets</b>}
+        {loading ? <Skeleton width={50} /> : <b>{ticketCount.current} tickets</b>}
       </Typography>
     </Stack>
   )

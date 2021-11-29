@@ -4,9 +4,18 @@ import { parseISO, formatDistanceToNow, format } from 'date-fns';
 import Error from './Error';
 
 const auth = `Bearer ${process.env.REACT_APP_TOKEN}`;
+const baseUrl = process.env.REACT_APP_ZCC_URL;
+const getRequestAttributes = {
+  method: 'GET',
+  mode: 'cors',
+  credentials: 'same-origin',
+  headers: {
+    'Authorization': auth
+  }
+};
 
 const convertDate = (isoDate) => {
-  return format(parseISO(isoDate), 'eee, dd MMMM yyyy');
+  return format(parseISO(isoDate), 'eee, dd MMM yyyy');
 }
 
 const convertDateToNow = (isoDate) => {
@@ -39,29 +48,22 @@ const TicketDetailed = ({ open, handleClose, ticketUrl }) => {
     return;
   };
 
+  /**
+   * @param {Zendesk User ID} user_id 
+   * @returns {Promise<Response> for User with 'user_id'}
+   * Fetch Zendesk User based on 'user_id' provided
+   */
   const fetchUser = async (user_id) => {
-    return fetch(
-      `${process.env.REACT_APP_ZCC_URL}api/v2/users/${user_id}`, {
-      method: 'GET',
-      mode: 'cors',
-      credentials: 'same-origin',
-      headers: {
-        'Authorization': auth
-      }
-    })
+    return fetch(`${baseUrl}api/v2/users/${user_id}`, getRequestAttributes)
       .then(response => response.json())
       .then(data => data.user);
   };
 
+  /**
+   * Fetch Ticket with 'ticketUrl' and Requester and Assginee
+   */
   const fetchTicket = async () => {
-    fetch(ticketUrl, {
-      method: 'GET',
-      mode: 'cors',
-      credentials: 'same-origin',
-      headers: {
-        'Authorization': auth
-      }
-    })
+    fetch(ticketUrl, getRequestAttributes)
       .then(response => response.json())
       .then(data => {
         setTicket(data.ticket);

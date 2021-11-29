@@ -17,6 +17,15 @@ import { useEffect, useState } from 'react';
 import { FiMoreHorizontal } from 'react-icons/fi';
 
 const auth = `Bearer ${process.env.REACT_APP_TOKEN}`;
+const baseUrl = process.env.REACT_APP_ZCC_URL;
+const getRequestAttributes = {
+  method: 'GET',
+  mode: 'cors',
+  credentials: 'same-origin',
+  headers: {
+    'Authorization': auth
+  }
+};
 
 const convertDate = (isoDate) => {
   return format(parseISO(isoDate), 'eee, dd MMM yyyy');
@@ -36,15 +45,7 @@ const TicketCard = ({ handleClickOpen, ticket }) => {
   const [users, setUsers] = useState([]);
 
   const fetchUser = async (user_id) => {
-    return fetch(
-      `${process.env.REACT_APP_ZCC_URL}api/v2/users/${user_id}`, {
-      method: 'GET',
-      mode: 'cors',
-      credentials: 'same-origin',
-      headers: {
-        'Authorization': auth
-      }
-    })
+    return fetch(`${baseUrl}api/v2/users/${user_id}`, getRequestAttributes)
       .then(response => response.json())
       .then(data => data.user);
   };
@@ -70,17 +71,17 @@ const TicketCard = ({ handleClickOpen, ticket }) => {
             :
             <>
               <Stack direction="row" spacing={1} alignItems="center">
-                <Chip size="small" color={ticket.status} label={ticket.status[0]} />
+                <Chip size="small" color={ticket.status} label={ticket.status} />
                 {showDetails ?
                   <Typography color="gray">
                     {ticket.type === null ? 'Ticket'
                       : capitaliseString(ticket.type)}
                     {` #${ticket.id}`}
+                    {ticket.priority !== null && ` (${ticket.priority})`}
                   </Typography>
                   :
                   <Typography color="gray">#{ticket.id}</Typography>
                 }
-
                 {showDetails && <Typography variant="h6">{ticket.subject}</Typography>}
               </Stack>
               {!showDetails && <Typography variant="h6">{ticket.subject}</Typography>}
@@ -145,7 +146,8 @@ const TicketCard = ({ handleClickOpen, ticket }) => {
       {!showDetails &&
         <CardActions>
           <IconButton
-            size="small"
+            color="primary"
+            size="medium"
             title="View Details"
             onClick={() => handleClickOpen(ticket.url)}
           >
