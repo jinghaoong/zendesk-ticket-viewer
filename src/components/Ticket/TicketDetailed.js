@@ -1,20 +1,13 @@
 import { Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Skeleton, Stack, Typography } from '@mui/material';
-import { format, formatDistanceToNow, parseISO } from 'date-fns';
 import { useEffect, useState } from 'react';
-import { baseUrl, getRequestAttributes } from '../../helpers';
+import {
+  baseUrl,
+  capitaliseString,
+  convertDate,
+  convertDateToNow,
+  getRequestAttributes
+} from '../../helpers';
 import Error from '../Error/Error';
-
-const convertDate = (isoDate) => {
-  return format(parseISO(isoDate), 'eee, dd MMM yyyy');
-}
-
-const convertDateToNow = (isoDate) => {
-  return formatDistanceToNow(parseISO(isoDate), { addSuffix: true });
-}
-
-const capitaliseString = (string) => {
-  return string[0].toUpperCase() + string.substring(1);
-}
 
 const TicketDetailed = ({ open, handleClose, ticketUrl }) => {
   const [error, setError] = useState();
@@ -39,9 +32,10 @@ const TicketDetailed = ({ open, handleClose, ticketUrl }) => {
   };
 
   /**
-   * @param {Zendesk User ID} user_id 
-   * @returns {Promise<Response> for User with 'user_id'}
    * Fetch Zendesk User based on 'user_id' provided
+   * 
+   * @param {String} user_id 
+   * @returns {Promise<Response>} Returns Promise for a User object with user_id
    */
   const fetchUser = async (user_id) => {
     return fetch(`${baseUrl}api/v2/users/${user_id}`, getRequestAttributes)
