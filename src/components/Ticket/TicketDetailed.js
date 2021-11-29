@@ -1,18 +1,8 @@
 import { Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Skeleton, Stack, Typography } from '@mui/material';
+import { format, formatDistanceToNow, parseISO } from 'date-fns';
 import { useEffect, useState } from 'react';
-import { parseISO, formatDistanceToNow, format } from 'date-fns';
-import Error from './Error';
-
-const auth = `Bearer ${process.env.REACT_APP_TOKEN}`;
-const baseUrl = process.env.REACT_APP_ZCC_URL;
-const getRequestAttributes = {
-  method: 'GET',
-  mode: 'cors',
-  credentials: 'same-origin',
-  headers: {
-    'Authorization': auth
-  }
-};
+import { baseUrl, getRequestAttributes } from '../../helpers';
+import Error from '../Error/Error';
 
 const convertDate = (isoDate) => {
   return format(parseISO(isoDate), 'eee, dd MMM yyyy');

@@ -2,21 +2,11 @@ import { Skeleton, Stack } from '@mui/material';
 import { Box } from '@mui/system';
 import { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import Error from './Error';
-import PaginationCluster from './PaginationCluster';
+import { baseUrl, getRequestAttributes } from '../../helpers';
+import Error from '../Error/Error';
+import PaginationCluster from '../PaginationCluster/PaginationCluster';
 import TicketCard from './TicketCard';
 import TicketDetailed from './TicketDetailed';
-
-const auth = `Bearer ${process.env.REACT_APP_TOKEN}`;
-const baseUrl = process.env.REACT_APP_ZCC_URL; // Company Domain URL
-const getRequestAttributes = {
-  method: 'GET',
-  mode: 'cors',
-  credentials: 'same-origin',
-  headers: {
-    'Authorization': auth
-  }
-};
 
 const ticketsUrl = `${baseUrl}api/v2/tickets`;
 const perPage = 25;
@@ -46,7 +36,7 @@ const TicketViewer = () => {
   /** Used for detailed ticket view on smaller screens */
   const [ticketUrl, setTicketUrl] = useState('');
 
-  const ticketCount = useRef();
+  const [ticketCount, setTicketCount] = useState();
   const pageNumber = useRef(1);
   const pageUrls = useRef({ 1: cursorUrl });
 
@@ -78,7 +68,7 @@ const TicketViewer = () => {
       .then(data => {
         const { count } = data;
         console.log(count);
-        ticketCount.current = count;
+        setTicketCount(count);
       })
       .catch(error => {
         handleErrors(error)

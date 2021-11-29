@@ -12,32 +12,15 @@ import {
   Typography,
   useMediaQuery
 } from '@mui/material';
-import { format, formatDistanceToNow, parseISO } from 'date-fns';
 import { useEffect, useState } from 'react';
 import { FiMoreHorizontal } from 'react-icons/fi';
-
-const auth = `Bearer ${process.env.REACT_APP_TOKEN}`;
-const baseUrl = process.env.REACT_APP_ZCC_URL;
-const getRequestAttributes = {
-  method: 'GET',
-  mode: 'cors',
-  credentials: 'same-origin',
-  headers: {
-    'Authorization': auth
-  }
-};
-
-const convertDate = (isoDate) => {
-  return format(parseISO(isoDate), 'eee, dd MMM yyyy');
-};
-
-const convertDateToNow = (isoDate) => {
-  return formatDistanceToNow(parseISO(isoDate), { addSuffix: true });
-};
-
-const capitaliseString = (string) => {
-  return string[0].toUpperCase() + string.substring(1);
-};
+import {
+  baseUrl,
+  capitaliseString,
+  convertDate,
+  convertDateToNow,
+  getRequestAttributes
+} from '../../helpers';
 
 const TicketCard = ({ handleClickOpen, ticket }) => {
   const theme = useTheme()

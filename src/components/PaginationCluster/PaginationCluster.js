@@ -63,7 +63,9 @@ const PaginationCluster = ({
         </Button>
       </ButtonGroup>
       <Typography variant="h6" textAlign="center">
-        {loading ? <Skeleton width={50} /> : <b>{ticketCount.current} tickets</b>}
+        {(loading || !ticketCount)
+          ? <Skeleton width={50} />
+          : <b>{ticketCount} tickets</b>}
       </Typography>
     </Stack>
   )
