@@ -33,13 +33,18 @@ const TicketViewer = () => {
   const [currUrl, setCurrUrl] = useState(cursorUrl);
   const [currData, setCurrData] = useState([]);
 
-  /** Used for detailed ticket view on smaller screens */
+  // Used for detailed ticket view ('TicketDetailed') on smaller screens
   const [ticketUrl, setTicketUrl] = useState('');
 
   const [ticketCount, setTicketCount] = useState();
   const pageNumber = useRef(1);
-  const pageUrls = useRef({ 1: cursorUrl });
 
+  /**
+   * Handles errors and sets error message state
+   * 
+   * @param {Error} error Error caught by fetch call
+   * @returns 
+   */
   const handleErrors = (error) => {
     console.log(error.statusCode);
     if (!error.status) {
@@ -100,9 +105,9 @@ const TicketViewer = () => {
   /** 
    * Upon page load / reload, fetch data
    * and destructure into
-   * tickets: tickets for current page, 
-   * meta: contains info for next page, 
-   * links: previous and next page URLs, 
+   * - tickets: tickets for current page, 
+   * - meta: contains info for next page, 
+   * - links: previous and next page URLs, 
    */
   useEffect(() => {
     reloadTickets();
@@ -135,14 +140,12 @@ const TicketViewer = () => {
     } else {
       pageNumber.current = pageNumber.current - 1;
       setCurrUrl(links.prev);
-      pageUrls.current[pageNumber.current] = links.prev;
     }
   };
 
   const handleNextPage = () => {
     pageNumber.current = pageNumber.current + 1;
     setCurrUrl(links.next);
-    pageUrls.current[pageNumber.current] = links.next;
   };
 
   /**
@@ -152,7 +155,6 @@ const TicketViewer = () => {
     perPage,
     ticketCount,
     pageNumber,
-    pageUrls,
     loading,
     meta,
     reloadTickets,
@@ -170,9 +172,9 @@ const TicketViewer = () => {
         minHeight="100%"
         mt="2em"
         mx={{
-          md: 10, // >900
-          lg: 30, // >1200
-          xl: 50 // >1536
+          md: 10, // >900px
+          lg: 30, // >1200px
+          xl: 50 // >1536px
         }}
       >
         {error && <Error error={error} />}
