@@ -20,4 +20,4 @@ describe('Header', () => {
     const header = wrapper.find(Typography).text();
     expect(header).toEqual('Zendesk Ticket Viewer');
   });
-})
+});
