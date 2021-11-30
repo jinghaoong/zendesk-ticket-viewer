@@ -1,7 +1,7 @@
 import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { mount } from 'enzyme';
-import Header from "./Header";
+import Header from './Header';
 
 const wrapper = mount(<Header />);
 

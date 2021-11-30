@@ -1,8 +1,4 @@
-import {
-  capitaliseString,
-  convertDate,
-  convertDateToNow
-} from './index';
+import { capitaliseString, convertDate, convertDateToNow } from './index';
 
 describe('Helpers', () => {
   it('capitaliseString capitalises the first letter of lowercase string', () => {

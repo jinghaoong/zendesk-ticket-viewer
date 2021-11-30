@@ -23,7 +23,7 @@ import {
 } from '../../helpers';
 
 const TicketCard = ({ handleClickOpen, ticket }) => {
-  const theme = useTheme()
+  const theme = useTheme();
   const showDetails = useMediaQuery(theme.breakpoints.up(768));
   const [users, setUsers] = useState([]);
 

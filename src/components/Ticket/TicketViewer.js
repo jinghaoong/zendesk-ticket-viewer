@@ -97,7 +97,7 @@ const TicketViewer = () => {
   }, [currData]);
 
   /**
-   * Pagination Functions / Handlers
+   * Functions / Handlers
    * Reload, To Start, Previous, Next
    * Passed in props to PaginationCluster
    */
