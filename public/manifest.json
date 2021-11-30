@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Zendesk Ticket Viewer",
+  "name": "Zendesk Coding Challenge - SG 2021",
   "icons": [
     {
       "src": "favicon.ico",
