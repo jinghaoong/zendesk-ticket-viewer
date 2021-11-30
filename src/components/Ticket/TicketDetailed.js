@@ -5,7 +5,8 @@ import {
   capitaliseString,
   convertDate,
   convertDateToNow,
-  getRequestAttributes
+  getRequestAttributes,
+  handleErrors
 } from '../../helpers';
 import Error from '../Error/Error';
 
@@ -13,23 +14,6 @@ const TicketDetailed = ({ open, handleClose, ticketUrl }) => {
   const [error, setError] = useState();
   const [ticket, setTicket] = useState();
   const [users, setUsers] = useState([]);
-
-  const handleErrors = (error) => {
-    console.log(error.statusCode);
-    if (!error.status) {
-      setError("Error: Couldn't Authenticate You / Unable to retrieve tickets");
-    } else {
-      switch (error.status) {
-        case 429:
-          setError('Read limit exceeded, please wait 1 minute before reloading');
-          break;
-        default:
-          setError('Unable to retrieve tickets');
-          break;
-      };
-    }
-    return;
-  };
 
   /**
    * Fetch Zendesk User based on 'user_id' provided
@@ -61,7 +45,7 @@ const TicketDetailed = ({ open, handleClose, ticketUrl }) => {
           .then(data => setUsers(data));
       })
       .catch(error => {
-        handleErrors(error);
+        setError(handleErrors(error));
       })
   };
 

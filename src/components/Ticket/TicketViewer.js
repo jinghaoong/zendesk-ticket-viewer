@@ -2,7 +2,7 @@ import { Skeleton, Stack } from '@mui/material';
 import { Box } from '@mui/system';
 import { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { baseUrl, getRequestAttributes } from '../../helpers';
+import { baseUrl, getRequestAttributes, handleErrors } from '../../helpers';
 import Error from '../Error/Error';
 import PaginationCluster from '../PaginationCluster/PaginationCluster';
 import TicketCard from './TicketCard';
@@ -40,29 +40,6 @@ const TicketViewer = () => {
   const pageNumber = useRef(1);
 
   /**
-   * Handles errors and sets error message state
-   * 
-   * @param {Error} error Error caught by fetch call
-   * @returns 
-   */
-  const handleErrors = (error) => {
-    console.log(error.statusCode);
-    if (!error.status) {
-      setError("Error: Couldn't Authenticate You / Unable to retrieve tickets");
-    } else {
-      switch (error.status) {
-        case 429:
-          setError('Read limit exceeded, please wait 1 minute before reloading');
-          break;
-        default:
-          setError('Unable to retrieve tickets');
-          break;
-      };
-    }
-    return;
-  };
-
-  /**
    * Get total number of tickets
    */
   const fetchAll = async () => {
@@ -76,7 +53,7 @@ const TicketViewer = () => {
         setTicketCount(count);
       })
       .catch(error => {
-        handleErrors(error)
+        setError(handleErrors(error));
         setLoading(false);
       });
   };
