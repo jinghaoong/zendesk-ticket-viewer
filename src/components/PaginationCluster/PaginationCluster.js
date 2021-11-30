@@ -37,7 +37,7 @@ const PaginationCluster = ({
       >
         {loading ? <FiRefreshCw /> : <FiRotateCw />}
       </Button>
-      <ButtonGroup variant="contained">
+      <ButtonGroup variant="contained" disabled={ticketCount === 0}>
         <Button
           disabled={loading || pageNumber.current === 1}
           title="Back to Start"
@@ -63,7 +63,7 @@ const PaginationCluster = ({
         </Button>
       </ButtonGroup>
       <Typography variant="h6" textAlign="center">
-        {(loading || !ticketCount)
+        {(loading || ticketCount === undefined)
           ? <Skeleton width={50} />
           : <b>{ticketCount} tickets</b>}
       </Typography>

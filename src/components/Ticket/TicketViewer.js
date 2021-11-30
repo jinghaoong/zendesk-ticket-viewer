@@ -1,4 +1,4 @@
-import { Skeleton, Stack } from '@mui/material';
+import { Card, CardContent, Skeleton, Stack, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
@@ -181,6 +181,14 @@ const TicketViewer = () => {
               handleClickOpen={handleClickOpen}
               ticket={ticket}
             />)
+        }
+        {(!loading && !error && tickets.length === 0)
+          &&
+          <Card sx={{ my: 2 }}>
+            <CardContent>
+              <Typography>No Tickets Found...</Typography>
+            </CardContent>
+          </Card>
         }
         {(!error && ticketCount)
           &&
